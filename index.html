@@ -427,7 +427,7 @@ function renderWeekView(){
       h+=`<div class="task-row" draggable="true" ondragstart="onDragStartWeek(event,'${dateStr}',${idx})" style="cursor:grab"><div class="task-check ${a.done?'done':''}" onclick="toggleWeekTask('${dateStr}',${idx})"></div><div class="task-text ${a.done?'done':''}">${esc(task.text)}</div>${task.dur?`<span class="task-tag" style="background:var(${cat.bg});color:var(${cat.txt})">${task.dur}</span>`:''}<div class="task-actions"><button title="Tomorrow" onclick="moveToTomorrow('${dateStr}',${idx})">→</button><button onclick="unassignTask('${dateStr}',${idx})">✕</button></div></div>`});
     h+=`<div class="day-drop-zone"><span class="day-drop-hint">Drop here</span></div></div></div>`});
   h+=`</div>`;
-  h+=`<div class="ai-box"><h3>AI Week Optimizer</h3><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px"><label style="font-size:13px;display:flex;align-items:center;gap:6px">Wake <input type="time" id="ai-wake" value="07:00" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label><label style="font-size:13px;display:flex;align-items:center;gap:6px">Sleep <input type="time" id="ai-sleep" value="22:30" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label></div><div style="margin-bottom:12px"><label style="font-size:12px;color:var(--text-3);display:flex;flex-direction:column;gap:4px">API Key <span style="font-size:11px">(required on hosted site — get one at console.anthropic.com)</span><input type="password" id="ai-api-key" placeholder="sk-ant-..." style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;max-width:400px"/></label></div><button class="btn btn-primary" onclick="generateWeekSchedule()" id="gen-btn">Generate optimized week</button><div class="ai-result" id="ai-result"></div></div>`;
+  h+=`<div class="ai-box"><h3>AI Week Optimizer</h3><p style="font-size:13px;color:var(--text-2);margin-bottom:14px">Analyzes your tasks, events, and logs to build an optimized weekly schedule.</p><div style="margin-bottom:14px"><label style="font-size:12px;font-weight:500;color:var(--text-2);display:flex;flex-direction:column;gap:4px">Anthropic API Key <span style="font-size:11px;font-weight:400;color:var(--text-3)">Required — get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--work-bar)">console.anthropic.com</a>. Saved locally in your browser.</span><input type="password" id="ai-api-key" placeholder="sk-ant-..." value="${esc(loadApiKey())}" style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;max-width:420px" onchange="saveApiKey(this.value.trim())"/></label></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"><label style="font-size:13px;display:flex;align-items:center;gap:6px">Wake <input type="time" id="ai-wake" value="07:00" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label><label style="font-size:13px;display:flex;align-items:center;gap:6px">Sleep <input type="time" id="ai-sleep" value="22:30" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label></div><button class="btn btn-primary" onclick="generateWeekSchedule()" id="gen-btn">Generate optimized week</button><div class="ai-result" id="ai-result"></div></div>`;
   document.getElementById('schedule-content').innerHTML=h;
 }
 function shiftWeek(dir){weekStart=new Date(weekStart);weekStart.setDate(weekStart.getDate()+dir*7);renderSchedule()}
@@ -471,7 +471,9 @@ function renderDayView(){
     <div class="log-field"><div class="log-field-label">Snack 2</div><input type="text" value="${esc(log.snack2||'')}" onchange="saveDayLog('${dateStr}','snack2',this.value)" placeholder="e.g. yogurt, trail mix..."/></div>
     <div class="log-field full"><div class="log-field-label">Hydration (glasses / oz)</div><input type="text" value="${esc(log.hydration||'')}" onchange="saveDayLog('${dateStr}','hydration',this.value)" placeholder="e.g. 8 glasses, 64 oz..."/></div>
     <div class="log-field full"><div class="log-field-label">Notes</div><textarea onchange="saveDayLog('${dateStr}','notes',this.value)" placeholder="Anything else...">${esc(log.notes||'')}</textarea></div>
-  </div></div></div>`;
+  </div></div>
+  <div class="ai-box"><h3>AI Day Optimizer</h3><p style="font-size:13px;color:var(--text-2);margin-bottom:14px">Creates a time-blocked schedule for today based on your tasks, events, energy, and mood.</p>${!loadApiKey()?`<div style="margin-bottom:14px"><label style="font-size:12px;font-weight:500;color:var(--text-2);display:flex;flex-direction:column;gap:4px">Anthropic API Key <span style="font-size:11px;font-weight:400;color:var(--text-3)">Required — set it in the Week view's AI Optimizer, or enter here.</span><input type="password" id="ai-api-key" placeholder="sk-ant-..." style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;max-width:420px" onchange="saveApiKey(this.value.trim())"/></label></div>`:''}<button class="btn btn-primary" onclick="generateDaySchedule()" id="gen-day-btn">Optimize today</button><div class="ai-result" id="ai-day-result"></div></div>
+  </div>`;
   document.getElementById('schedule-content').innerHTML=h;
 }
 function shiftDay(dir){const d=parseDate(viewDay);d.setDate(d.getDate()+dir);viewDay=fmtDate(d);renderSchedule()}
@@ -483,11 +485,154 @@ function moveDayTask(d,i){moveToTomorrow(d,i)}
 function removeDayTask(d,i){unassignTask(d,i)}
 
 /* AI */
-function generateWeekSchedule(){const btn=document.getElementById('gen-btn');const result=document.getElementById('ai-result');btn.disabled=true;btn.textContent='Generating...';result.textContent='';const wake=document.getElementById('ai-wake').value||'07:00';const sleep=document.getElementById('ai-sleep').value||'22:30';const dates=getWeekDates(weekStart);let evStr='';dates.forEach((d,i)=>{const ev=calEvents[d]||[];if(ev.length){evStr+=`\n${DAYNAMES[i]} (${d}):\n`;ev.forEach(e=>evStr+=`  ${e.start||'?'}-${e.end||'?'}: ${e.name}\n`)}});let aStr='';dates.forEach((d,i)=>{const a=weekAssignments[d]||[];if(a.length){aStr+=`\n${DAYNAMES[i]}: `+a.map(x=>{const t=findTask(x.catId,x.taskId);return t?`${t.text} (${t.dur||'?'})${x.done?' [DONE]':''}`:'?'}).join(', ')}});const unassigned=CATS.flatMap(c=>tasks[c.id].filter(t=>!t.done).map(t=>({...t,cat:c.name}))).filter(t=>!Object.values(weekAssignments).flat().some(a=>a.taskId===t.id));const uStr=unassigned.map(t=>`[${t.cat}] ${t.text} (${t.dur||'no est'})`).join('\n');const prompt=`Weekly schedule optimizer.\nWake: ${wake} | Sleep: ${sleep}\nCALENDAR EVENTS (fixed):\n${evStr||'(none)'}\nALREADY ASSIGNED:\n${aStr||'(none)'}\nUNASSIGNED:\n${uStr||'(none)'}\nRules: Events fixed. Keep assigned tasks. Distribute unassigned evenly. Multiple workouts OK. High-focus AM. Include breaks/meals. Format: === DAY (date) ===\n  TIME — Activity (dur)`;
-  const apiKeyEl=document.getElementById('ai-api-key');
-  const headers={'Content-Type':'application/json'};
-  if(apiKeyEl&&apiKeyEl.value.trim()){headers['x-api-key']=apiKeyEl.value.trim();headers['anthropic-version']='2023-06-01';headers['anthropic-dangerous-direct-browser-access']='true'}
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers,body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})}).then(r=>r.json()).then(data=>{if(data.error){result.textContent='Error: '+(data.error.message||JSON.stringify(data.error))}else{result.textContent=data.content?.map(b=>b.text||'').join('\n')||'No response'}btn.disabled=false;btn.textContent='Generate optimized week'}).catch(err=>{result.textContent='Error: '+err.message;btn.disabled=false;btn.textContent='Generate optimized week'})}
+function getApiKey(){
+  const el=document.getElementById('ai-api-key');
+  if(el&&el.value.trim()) return el.value.trim();
+  return loadApiKey();
+}
+function saveApiKey(key){try{localStorage.setItem('dp-api-key',key)}catch(e){}}
+function loadApiKey(){try{return localStorage.getItem('dp-api-key')||''}catch(e){return''}}
+
+function callClaude(prompt,btn,result,originalLabel){
+  const apiKey=getApiKey();
+  if(!apiKey){
+    result.innerHTML='<span style="color:#C62828">⚠ Please enter your Anthropic API key above. You can get one free at <a href="https://console.anthropic.com" target="_blank" style="color:#185FA5;text-decoration:underline">console.anthropic.com</a></span>';
+    btn.disabled=false;btn.textContent=originalLabel;
+    return;
+  }
+  saveApiKey(apiKey);
+  btn.disabled=true;btn.textContent='Generating...';
+  result.innerHTML='<span style="color:var(--text-3)">Thinking... this may take 10–20 seconds.</span>';
+
+  const headers={
+    'Content-Type':'application/json',
+    'x-api-key':apiKey,
+    'anthropic-version':'2023-06-01',
+    'anthropic-dangerous-direct-browser-access':'true'
+  };
+
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers,
+    body:JSON.stringify({
+      model:'claude-sonnet-4-20250514',
+      max_tokens:2000,
+      messages:[{role:'user',content:prompt}]
+    })
+  })
+  .then(r=>{
+    if(!r.ok) return r.json().then(d=>{throw new Error(d.error?.message||'API error '+r.status)}).catch(e=>{if(e.message.startsWith('API error')||e.message.includes('Invalid'))throw e;throw new Error('Request failed (status '+r.status+'). Check your API key.')});
+    return r.json();
+  })
+  .then(data=>{
+    if(data.error){
+      result.innerHTML='<span style="color:#C62828">Error: '+(data.error.message||JSON.stringify(data.error))+'</span>';
+    } else {
+      const text=data.content?.map(b=>b.text||'').join('\n')||'No response received.';
+      result.textContent=text;
+    }
+    btn.disabled=false;btn.textContent=originalLabel;
+  })
+  .catch(err=>{
+    let msg=err.message||'Unknown error';
+    if(msg.includes('Failed to fetch')||msg.includes('NetworkError'))
+      msg='Network error — this can happen if the API key is invalid or CORS is blocked. Double-check your key.';
+    result.innerHTML='<span style="color:#C62828">⚠ '+esc(msg)+'</span>';
+    btn.disabled=false;btn.textContent=originalLabel;
+  });
+}
+
+function generateWeekSchedule(){
+  const btn=document.getElementById('gen-btn');
+  const result=document.getElementById('ai-result');
+  const wake=document.getElementById('ai-wake').value||'07:00';
+  const sleep=document.getElementById('ai-sleep').value||'22:30';
+  const dates=getWeekDates(weekStart);
+
+  let evStr='';
+  dates.forEach((d,i)=>{const ev=calEvents[d]||[];if(ev.length){evStr+=`\n${DAYNAMES[i]} (${d}):\n`;ev.forEach(e=>evStr+=`  ${e.start||'?'}-${e.end||'?'}: ${e.name}\n`)}});
+
+  let aStr='';
+  dates.forEach((d,i)=>{const a=weekAssignments[d]||[];if(a.length){aStr+=`\n${DAYNAMES[i]}: `+a.map(x=>{const t=findTask(x.catId,x.taskId);return t?`${t.text} (${t.dur||'?'})${x.done?' [DONE]':''}`:'?'}).join(', ')}});
+
+  const unassigned=CATS.flatMap(c=>tasks[c.id].filter(t=>!t.done).map(t=>({...t,cat:c.name}))).filter(t=>!Object.values(weekAssignments).flat().some(a=>a.taskId===t.id));
+  const uStr=unassigned.map(t=>`[${t.cat}] ${t.text} (${t.dur||'no est'})`).join('\n');
+
+  const prompt=`You are a weekly schedule optimizer. Create a realistic, balanced week plan.
+
+Wake: ${wake} | Sleep: ${sleep}
+
+CALENDAR EVENTS (fixed — schedule around these):
+${evStr||'(none)'}
+
+ALREADY ASSIGNED TO DAYS:
+${aStr||'(none)'}
+
+UNASSIGNED TASKS (distribute these across the week):
+${uStr||'(none)'}
+
+Rules:
+- Calendar events are FIXED — include them at their times, don't move them
+- Keep already-assigned tasks on their days unless there's a conflict
+- Distribute unassigned tasks evenly across the week
+- Multiple workouts per day is fine — vary them
+- Schedule high-focus work in mornings
+- Include breaks, meals, transitions
+- Don't overschedule any single day
+- Format each day as:
+  === MONDAY (date) ===
+  TIME — Activity (duration)
+- Keep it practical and human
+- Add brief notes on why you placed things where you did`;
+
+  callClaude(prompt,btn,result,'Generate optimized week');
+}
+
+function generateDaySchedule(){
+  const btn=document.getElementById('gen-day-btn');
+  const result=document.getElementById('ai-day-result');
+  const dateStr=viewDay;
+  const d=parseDate(dateStr);
+  const dayName=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+  const log=dailyLogs[dateStr]||{};
+  const evts=(calEvents[dateStr]||[]).slice().sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+  const assigned=weekAssignments[dateStr]||[];
+
+  let evStr='';
+  evts.forEach(e=>{evStr+=`  ${e.start||'?'}-${e.end||'?'}: ${e.name}\n`});
+
+  let taskStr='';
+  assigned.forEach(a=>{const t=findTask(a.catId,a.taskId);if(!t)return;const cat=CATS.find(c=>c.id===a.catId);taskStr+=`  [${cat?.name||'?'}] ${t.text} (${t.dur||'no estimate'})${a.done?' [DONE]':''}\n`});
+
+  const unassigned=CATS.flatMap(c=>tasks[c.id].filter(t=>!t.done).map(t=>({...t,cat:c.name}))).filter(t=>!Object.values(weekAssignments).flat().some(a=>a.taskId===t.id));
+  const uStr=unassigned.slice(0,15).map(t=>`  [${t.cat}] ${t.text} (${t.dur||'no est'})`).join('\n');
+
+  const prompt=`Create a realistic, time-blocked schedule for ${dayName}.
+
+Sleep last night: ${log.sleep||'not logged'} hours
+Energy level: ${log.energy||'not logged'}/10
+Mood: ${log.mood?['','😫 rough','😐 meh','🙂 good','😄 great'][log.mood]:'not logged'}
+
+FIXED EVENTS (do not move these):
+${evStr||'(none)'}
+
+ASSIGNED TASKS FOR TODAY:
+${taskStr||'(none)'}
+
+UNASSIGNED TASKS (optionally suggest fitting some in):
+${uStr||'(none)'}
+
+Rules:
+- Calendar events are FIXED — include them at their times
+- Schedule high-focus work during peak energy (usually morning)
+- If energy or sleep is low, go easier — lighter tasks first, harder ones midday
+- Include breaks, meals, and transitions
+- Be realistic about time — don't overschedule
+- Format: TIME — Activity (duration)
+- Keep it practical and human`;
+
+  callClaude(prompt,btn,result,'Optimize today');
+}
 
 /* DATA */
 let dataRange='7';
