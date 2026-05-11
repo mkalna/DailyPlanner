@@ -144,7 +144,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .day-drop-zone.active .day-drop-hint{display:block}
 
 /* Day view */
-.day-view{max-width:700px}
+.day-view{max-width:780px}
 .day-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:16px}
 .day-section-title{font-size:14px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .day-section-title .dot{width:8px;height:8px;border-radius:50%}
@@ -166,6 +166,40 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .day-event-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--calendar-bg);border-radius:var(--radius-sm);margin-bottom:6px;border-left:3px solid var(--calendar-bar)}
 .day-event-row-time{font-size:13px;font-weight:500;color:var(--calendar-txt);min-width:100px}
 .day-event-row-name{flex:1;font-size:14px;color:var(--calendar-txt)}
+
+/* Timeline */
+.timeline-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px}
+.timeline-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.timeline-header-title{font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+.timeline{position:relative;min-height:200px}
+.timeline-hour-row{display:flex;align-items:flex-start;border-bottom:1px solid rgba(0,0,0,.04);min-height:60px;position:relative}
+.timeline-hour-label{width:64px;padding:4px 12px 0 0;text-align:right;font-size:11px;color:var(--text-3);font-weight:500;flex-shrink:0;position:sticky;left:0}
+.timeline-hour-content{flex:1;min-height:60px;position:relative;border-left:1px solid var(--border)}
+.timeline-half{position:absolute;left:0;right:0;top:50%;border-top:1px dashed rgba(0,0,0,.04)}
+.timeline-block{position:relative;margin:2px 6px;padding:8px 12px;border-radius:var(--radius-sm);cursor:grab;transition:box-shadow .15s,transform .15s;display:flex;align-items:flex-start;gap:10px;min-height:36px;user-select:none}
+.timeline-block:hover{box-shadow:0 2px 8px rgba(0,0,0,.1);transform:translateY(-1px)}
+.timeline-block.dragging{opacity:.5;transform:scale(.97)}
+.timeline-block-event{background:var(--calendar-bg);border-left:3px solid var(--calendar-bar);cursor:default}
+.timeline-block-task{border-left:3px solid var(--text-3)}
+.timeline-block-check{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-md);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .12s}
+.timeline-block-check.done{border-color:var(--chores-bar);background:var(--chores-bar)}
+.timeline-block-check.done::after{content:'✓';color:#fff;font-size:10px;font-weight:600}
+.timeline-block-body{flex:1;min-width:0}
+.timeline-block-name{font-size:13px;font-weight:500;line-height:1.3}
+.timeline-block-name.done{text-decoration:line-through;color:var(--text-3)}
+.timeline-block-meta{font-size:11px;color:var(--text-2);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.timeline-block-actions{display:flex;gap:2px;flex-shrink:0}
+.timeline-block-actions button{background:none;border:none;cursor:pointer;color:var(--text-3);font-size:12px;padding:3px;border-radius:4px;transition:all .12s}
+.timeline-block-actions button:hover{color:var(--text);background:var(--surface2)}
+.timeline-drop-indicator{height:3px;background:var(--work-bar);border-radius:2px;margin:0 6px;transition:opacity .1s;opacity:0;pointer-events:none}
+.timeline-drop-indicator.visible{opacity:1}
+.timeline-unscheduled{padding:16px 20px;border-top:1px solid var(--border)}
+.timeline-unscheduled-title{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--text-3);margin-bottom:10px}
+.timeline-unscheduled-item{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:4px;cursor:grab;transition:all .12s}
+.timeline-unscheduled-item:hover{background:var(--surface3)}
+.time-picker-inline{display:flex;gap:4px;align-items:center}
+.time-picker-inline select{padding:3px 4px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:inherit;background:var(--surface);cursor:pointer}
+.time-picker-inline select:focus{outline:none;border-color:var(--border-md)}
 
 .ai-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-top:1rem}
 .ai-box h3{font-family:'DM Serif Display',serif;font-size:18px;margin-bottom:12px}
@@ -427,7 +461,7 @@ function renderWeekView(){
       h+=`<div class="task-row" draggable="true" ondragstart="onDragStartWeek(event,'${dateStr}',${idx})" style="cursor:grab"><div class="task-check ${a.done?'done':''}" onclick="toggleWeekTask('${dateStr}',${idx})"></div><div class="task-text ${a.done?'done':''}">${esc(task.text)}</div>${task.dur?`<span class="task-tag" style="background:var(${cat.bg});color:var(${cat.txt})">${task.dur}</span>`:''}<div class="task-actions"><button title="Tomorrow" onclick="moveToTomorrow('${dateStr}',${idx})">→</button><button onclick="unassignTask('${dateStr}',${idx})">✕</button></div></div>`});
     h+=`<div class="day-drop-zone"><span class="day-drop-hint">Drop here</span></div></div></div>`});
   h+=`</div>`;
-  h+=`<div class="ai-box"><h3>AI Week Optimizer</h3><p style="font-size:13px;color:var(--text-2);margin-bottom:14px">Analyzes your tasks, events, and logs to build an optimized weekly schedule.</p><div style="margin-bottom:14px"><label style="font-size:12px;font-weight:500;color:var(--text-2);display:flex;flex-direction:column;gap:4px">Anthropic API Key <span style="font-size:11px;font-weight:400;color:var(--text-3)">Required — get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--work-bar)">console.anthropic.com</a>. Saved locally in your browser.</span><input type="password" id="ai-api-key" placeholder="sk-ant-..." value="${esc(loadApiKey())}" style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;max-width:420px" onchange="saveApiKey(this.value.trim())"/></label></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"><label style="font-size:13px;display:flex;align-items:center;gap:6px">Wake <input type="time" id="ai-wake" value="07:00" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label><label style="font-size:13px;display:flex;align-items:center;gap:6px">Sleep <input type="time" id="ai-sleep" value="22:30" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label></div><button class="btn btn-primary" onclick="generateWeekSchedule()" id="gen-btn">Generate optimized week</button><div class="ai-result" id="ai-result"></div></div>`;
+  h+=`<div class="ai-box"><h3>AI Week Optimizer</h3><p style="font-size:13px;color:var(--text-2);margin-bottom:14px">Analyzes your tasks, events, and logs to build an optimized weekly schedule.</p><div style="margin-bottom:14px"><label style="font-size:12px;font-weight:500;color:var(--text-2);display:flex;flex-direction:column;gap:4px">Anthropic API Key <span style="font-size:11px;font-weight:400;color:var(--text-3)">Required — get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--work-bar)">console.anthropic.com</a>. Saved locally.</span><input type="password" id="ai-api-key" placeholder="sk-ant-..." value="${esc(loadApiKey())}" style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;max-width:420px" onchange="saveApiKey(this.value.trim())"/></label></div><div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px"><label style="font-size:13px;display:flex;align-items:center;gap:6px">Wake <input type="time" id="ai-wake" value="07:00" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label><label style="font-size:13px;display:flex;align-items:center;gap:6px">Sleep <input type="time" id="ai-sleep" value="22:30" style="padding:6px 8px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit"/></label></div><button class="btn btn-primary" onclick="generateWeekSchedule()" id="gen-btn">Generate optimized week</button><div class="ai-result" id="ai-result"></div></div>`;
   document.getElementById('schedule-content').innerHTML=h;
 }
 function shiftWeek(dir){weekStart=new Date(weekStart);weekStart.setDate(weekStart.getDate()+dir*7);renderSchedule()}
@@ -444,22 +478,172 @@ function onDragOver(e){e.preventDefault();e.currentTarget.classList.add('drag-ov
 function onDragLeave(e){if(!e.currentTarget.contains(e.relatedTarget)){e.currentTarget.classList.remove('drag-over');const dz=e.currentTarget.querySelector('.day-drop-zone');if(dz)dz.classList.remove('active')}}
 function onDrop(e,dateStr){e.preventDefault();e.currentTarget.classList.remove('drag-over');const dz=e.currentTarget.querySelector('.day-drop-zone');if(dz)dz.classList.remove('active');if(!dragData)return;if(dragData.type==='week'){const a=weekAssignments[dragData.fromDate]?.[dragData.idx];if(a&&dragData.fromDate!==dateStr){weekAssignments[dragData.fromDate].splice(dragData.idx,1);if(!weekAssignments[dragData.fromDate].length)delete weekAssignments[dragData.fromDate];if(!weekAssignments[dateStr])weekAssignments[dateStr]=[];weekAssignments[dateStr].push(a)}}dragData=null;save();renderSchedule()}
 
-/* DAY VIEW */
+/* DAY VIEW — TIMELINE */
+let dayTimeSlots={};// {date: [{id,type:'task'|'event',catId?,taskId?,name,start:'HH:MM',dur:minutes,done?}]}
+try{const raw=localStorage.getItem('dp-timeslots');if(raw)dayTimeSlots=JSON.parse(raw)}catch(e){}
+function saveTimeSlots(){localStorage.setItem('dp-timeslots',JSON.stringify(dayTimeSlots))}
+
+function durToMin(dur){if(!dur)return 30;const m=dur.match(/(\d+\.?\d*)\s*h/);if(m)return Math.round(parseFloat(m[1])*60);const m2=dur.match(/(\d+)\s*m/);return m2?parseInt(m2[1]):30}
+function minToDurStr(m){if(m>=60){const h=Math.floor(m/60);const r=m%60;return r?`${h}h ${r}m`:`${h}h`}return`${m}m`}
+function addMinutes(timeStr,mins){const[h,m]=timeStr.split(':').map(Number);const total=h*60+m+mins;const nh=Math.floor(total/60)%24;const nm=total%60;return String(nh).padStart(2,'0')+':'+String(nm).padStart(2,'0')}
+
+function buildDaySlots(dateStr){
+  // Merge calendar events + assigned tasks into time slots for this day
+  const slots=dayTimeSlots[dateStr]||[];
+  const evts=(calEvents[dateStr]||[]);
+  const assigned=weekAssignments[dateStr]||[];
+
+  // Ensure events are in slots
+  evts.forEach(ev=>{
+    const eid='ev-'+ev.name+'-'+(ev.start||'');
+    if(!slots.find(s=>s.id===eid)){
+      const durMin=ev.start&&ev.end?((parseInt(ev.end.split(':')[0])*60+parseInt(ev.end.split(':')[1]))-(parseInt(ev.start.split(':')[0])*60+parseInt(ev.start.split(':')[1]))):60;
+      slots.push({id:eid,type:'event',name:ev.name,start:ev.start||'09:00',dur:Math.max(durMin,15)});
+    }
+  });
+
+  // Ensure assigned tasks are in slots (unscheduled if no time set)
+  assigned.forEach((a,idx)=>{
+    const tid='task-'+a.catId+'-'+a.taskId;
+    if(!slots.find(s=>s.id===tid)){
+      const task=findTask(a.catId,a.taskId);
+      if(!task)return;
+      slots.push({id:tid,type:'task',catId:a.catId,taskId:a.taskId,name:task.text,start:'',dur:durToMin(task.dur),done:a.done||false});
+    } else {
+      // sync done state
+      const s=slots.find(s=>s.id===tid);
+      if(s)s.done=a.done||false;
+    }
+  });
+
+  // Remove slots for tasks that were unassigned
+  const validTaskIds=assigned.map(a=>'task-'+a.catId+'-'+a.taskId);
+  const validEvIds=evts.map(ev=>'ev-'+ev.name+'-'+(ev.start||''));
+  const filtered=slots.filter(s=>{
+    if(s.type==='event')return validEvIds.includes(s.id);
+    if(s.type==='task')return validTaskIds.includes(s.id);
+    return true;
+  });
+
+  dayTimeSlots[dateStr]=filtered;
+  saveTimeSlots();
+  return filtered;
+}
+
+function setSlotTime(dateStr,slotId,hour,minute){
+  const slots=dayTimeSlots[dateStr]||[];
+  const s=slots.find(x=>x.id===slotId);
+  if(s){
+    s.start=String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');
+    saveTimeSlots();
+    renderSchedule();
+  }
+}
+function clearSlotTime(dateStr,slotId){
+  const slots=dayTimeSlots[dateStr]||[];
+  const s=slots.find(x=>x.id===slotId);
+  if(s){s.start='';saveTimeSlots();renderSchedule()}
+}
+function setSlotDuration(dateStr,slotId,mins){
+  const slots=dayTimeSlots[dateStr]||[];
+  const s=slots.find(x=>x.id===slotId);
+  if(s){s.dur=mins;saveTimeSlots();renderSchedule()}
+}
+
 function renderDayView(){
   const dateStr=viewDay;const d=parseDate(dateStr);const dayName=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
-  const evts=(calEvents[dateStr]||[]).slice().sort((a,b)=>(a.start||'').localeCompare(b.start||''));const assigned=weekAssignments[dateStr]||[];const log=dailyLogs[dateStr]||{};
+  const log=dailyLogs[dateStr]||{};
+  const slots=buildDaySlots(dateStr);
+
+  const scheduled=slots.filter(s=>s.start).sort((a,b)=>a.start.localeCompare(b.start));
+  const unscheduled=slots.filter(s=>!s.start&&s.type==='task');
+
+  // Determine hour range
+  let startHour=6,endHour=22;
+  if(scheduled.length){
+    const firstH=parseInt(scheduled[0].start.split(':')[0]);
+    const lastS=scheduled[scheduled.length-1];
+    const lastEnd=parseInt(lastS.start.split(':')[0])+Math.ceil(lastS.dur/60);
+    startHour=Math.min(startHour,firstH);
+    endHour=Math.max(endHour,lastEnd+1);
+  }
+
   let h=`<div class="day-view"><div class="sched-nav"><button class="btn btn-sm" onclick="shiftDay(-1)">←</button><div class="sched-nav-label">${dayName}</div><button class="btn btn-sm" onclick="shiftDay(1)">→</button><button class="btn btn-sm" onclick="goToday()">Today</button></div>`;
   h+=renderAssignPanel();
-  // Events
-  h+=`<div class="day-section"><div class="day-section-title"><span class="dot" style="background:var(--calendar-bar)"></span>Events</div>`;
-  if(evts.length){evts.forEach(ev=>{const ts=ev.start?(ev.end?fmtTime(ev.start)+' – '+fmtTime(ev.end):fmtTime(ev.start)):'';h+=`<div class="day-event-row"><div class="day-event-row-time">${ts}</div><div class="day-event-row-name">${esc(ev.name)}</div></div>`})}else{h+=`<div style="color:var(--text-3);font-size:13px">No events</div>`}
-  h+=`</div>`;
-  // Tasks
-  h+=`<div class="day-section"><div class="day-section-title"><span class="dot" style="background:var(--work-bar)"></span>Tasks</div>`;
-  if(assigned.length){assigned.forEach((a,idx)=>{const task=findTask(a.catId,a.taskId);if(!task)return;const cat=CATS.find(c=>c.id===a.catId);
-    h+=`<div class="task-row"><div class="task-check ${a.done?'done':''}" onclick="toggleDayTask('${dateStr}',${idx})"></div><div class="task-text ${a.done?'done':''}">${esc(task.text)}</div><div class="task-meta"><span class="task-tag" style="background:var(${cat.bg});color:var(${cat.txt})">${cat.name}</span>${task.dur?`<span class="task-tag" style="background:var(--surface2);color:var(--text-2)">${task.dur}</span>`:''}</div><div class="task-actions"><button onclick="moveDayTask('${dateStr}',${idx})">→ Tomorrow</button><button onclick="removeDayTask('${dateStr}',${idx})">✕</button></div></div>`})}else{h+=`<div style="color:var(--text-3);font-size:13px">No tasks assigned. Use the panel above to assign tasks.</div>`}
-  h+=`</div>`;
-  // Log
+
+  // Timeline
+  h+=`<div class="timeline-wrap"><div class="timeline-header"><div class="timeline-header-title"><span class="dot" style="background:var(--work-bar)"></span>Schedule</div><div style="display:flex;gap:6px"><button class="btn btn-sm" onclick="autoScheduleDay('${dateStr}')">Auto-fill times</button></div></div>`;
+  h+=`<div class="timeline" id="day-timeline">`;
+
+  for(let hr=startHour;hr<=endHour;hr++){
+    const hrStr=hr%12||12;const ampm=hr>=12?'PM':'AM';
+    const slotsThisHour=scheduled.filter(s=>{const sh=parseInt(s.start.split(':')[0]);return sh===hr});
+
+    h+=`<div class="timeline-hour-row" data-hour="${hr}"><div class="timeline-hour-label">${hrStr} ${ampm}</div><div class="timeline-hour-content" ondragover="onTimelineDragOver(event,${hr},'${dateStr}')" ondragleave="onTimelineDragLeave(event)" ondrop="onTimelineDrop(event,${hr},'${dateStr}')">`;
+    h+=`<div class="timeline-half"></div>`;
+
+    slotsThisHour.forEach(s=>{
+      const cat=s.catId?CATS.find(c=>c.id===s.catId):null;
+      const bgColor=s.type==='event'?'var(--calendar-bg)':cat?`var(${cat.bg})`:'var(--surface2)';
+      const borderColor=s.type==='event'?'var(--calendar-bar)':cat?`var(${cat.bar})`:'var(--text-3)';
+      const txtColor=s.type==='event'?'var(--calendar-txt)':cat?`var(${cat.txt})`:'var(--text)';
+      const isTask=s.type==='task';
+      const endTime=addMinutes(s.start,s.dur);
+
+      h+=`<div class="timeline-block ${s.type==='event'?'timeline-block-event':'timeline-block-task'}" style="background:${bgColor};border-left-color:${borderColor};color:${txtColor}" ${isTask?`draggable="true" ondragstart="onTimelineDragStart(event,'${dateStr}','${s.id}')"`:''}>`
+
+      if(isTask){
+        h+=`<div class="timeline-block-check ${s.done?'done':''}" onclick="toggleTimelineTask('${dateStr}','${s.id}')"></div>`;
+      }
+      h+=`<div class="timeline-block-body"><div class="timeline-block-name ${isTask&&s.done?'done':''}">${esc(s.name)}</div>`;
+      h+=`<div class="timeline-block-meta"><span>${fmtTime(s.start)} – ${fmtTime(endTime)}</span>`;
+      if(cat)h+=`<span class="task-tag" style="background:${bgColor};color:${txtColor};border:1px solid ${borderColor}">${cat.name}</span>`;
+      h+=`<span>${minToDurStr(s.dur)}</span>`;
+      h+=`</div></div>`;
+
+      if(isTask){
+        h+=`<div class="timeline-block-actions">`;
+        h+=`<select onchange="setSlotDuration('${dateStr}','${s.id}',parseInt(this.value))" style="padding:2px 4px;border:1px solid var(--border);border-radius:4px;font-size:10px;font-family:inherit;background:var(--surface)">`;
+        [15,30,45,60,90,120,180].forEach(m=>{h+=`<option value="${m}" ${s.dur===m?'selected':''}>${minToDurStr(m)}</option>`});
+        h+=`</select>`;
+        h+=`<button title="Unschedule" onclick="clearSlotTime('${dateStr}','${s.id}')">↩</button>`;
+        h+=`<button title="Tomorrow" onclick="moveDayTask2('${dateStr}','${s.id}')">→</button>`;
+        h+=`<button title="Remove" onclick="removeDayTask2('${dateStr}','${s.id}')">✕</button>`;
+        h+=`</div>`;
+      }
+      h+=`</div>`;
+    });
+
+    h+=`</div></div>`;
+  }
+  h+=`</div>`;// end .timeline
+
+  // Unscheduled tasks
+  if(unscheduled.length){
+    h+=`<div class="timeline-unscheduled"><div class="timeline-unscheduled-title">Unscheduled tasks — drag onto timeline or set a time</div>`;
+    unscheduled.forEach(s=>{
+      const cat=s.catId?CATS.find(c=>c.id===s.catId):null;
+      h+=`<div class="timeline-unscheduled-item" draggable="true" ondragstart="onTimelineDragStart(event,'${dateStr}','${s.id}')">`;
+      h+=`<div class="timeline-block-check ${s.done?'done':''}" onclick="toggleTimelineTask('${dateStr}','${s.id}')"></div>`;
+      h+=`<span style="flex:1;font-size:13px;${s.done?'text-decoration:line-through;color:var(--text-3)':''}">${esc(s.name)}</span>`;
+      if(cat)h+=`<span class="task-tag" style="background:var(${cat.bg});color:var(${cat.txt})">${cat.name}</span>`;
+      h+=`<span class="task-tag" style="background:var(--surface);color:var(--text-2)">${minToDurStr(s.dur)}</span>`;
+      h+=`<div class="time-picker-inline"><select onchange="if(this.value)quickSchedule('${dateStr}','${s.id}',this.value)"><option value="">Set time</option>`;
+      for(let hr=5;hr<=23;hr++){
+        [0,30].forEach(m=>{
+          const tv=String(hr).padStart(2,'0')+':'+String(m).padStart(2,'0');
+          h+=`<option value="${tv}">${fmtTime(tv)}</option>`;
+        });
+      }
+      h+=`</select></div>`;
+      h+=`<button class="btn btn-sm" style="padding:3px 8px;font-size:11px" onclick="removeDayTask2('${dateStr}','${s.id}')">✕</button>`;
+      h+=`</div>`;
+    });
+    h+=`</div>`;
+  }
+  h+=`</div>`;// end .timeline-wrap
+
+  // Daily Log
   h+=`<div class="day-section"><div class="day-section-title"><span class="dot" style="background:var(--school-bar)"></span>Daily Log</div><div class="log-form">
     <div class="log-field"><div class="log-field-label">Sleep (hours)</div><input type="number" min="0" max="24" step="0.5" value="${log.sleep||''}" onchange="saveDayLog('${dateStr}','sleep',this.value)" placeholder="e.g. 7.5"/></div>
     <div class="log-field"><div class="log-field-label">Energy level</div><div class="energy-slider"><span>Low</span><input type="range" min="1" max="10" value="${log.energy||5}" oninput="document.getElementById('ev-${dateStr}').textContent=this.value;saveDayLog('${dateStr}','energy',this.value)"/><div class="energy-val" id="ev-${dateStr}">${log.energy||5}</div><span>High</span></div></div>
@@ -471,11 +655,130 @@ function renderDayView(){
     <div class="log-field"><div class="log-field-label">Snack 2</div><input type="text" value="${esc(log.snack2||'')}" onchange="saveDayLog('${dateStr}','snack2',this.value)" placeholder="e.g. yogurt, trail mix..."/></div>
     <div class="log-field full"><div class="log-field-label">Hydration (glasses / oz)</div><input type="text" value="${esc(log.hydration||'')}" onchange="saveDayLog('${dateStr}','hydration',this.value)" placeholder="e.g. 8 glasses, 64 oz..."/></div>
     <div class="log-field full"><div class="log-field-label">Notes</div><textarea onchange="saveDayLog('${dateStr}','notes',this.value)" placeholder="Anything else...">${esc(log.notes||'')}</textarea></div>
-  </div></div>
-  <div class="ai-box"><h3>AI Day Optimizer</h3><p style="font-size:13px;color:var(--text-2);margin-bottom:14px">Creates a time-blocked schedule for today based on your tasks, events, energy, and mood.</p>${!loadApiKey()?`<div style="margin-bottom:14px"><label style="font-size:12px;font-weight:500;color:var(--text-2);display:flex;flex-direction:column;gap:4px">Anthropic API Key <span style="font-size:11px;font-weight:400;color:var(--text-3)">Required — set it in the Week view's AI Optimizer, or enter here.</span><input type="password" id="ai-api-key" placeholder="sk-ant-..." style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;max-width:420px" onchange="saveApiKey(this.value.trim())"/></label></div>`:''}<button class="btn btn-primary" onclick="generateDaySchedule()" id="gen-day-btn">Optimize today</button><div class="ai-result" id="ai-day-result"></div></div>
-  </div>`;
+  </div></div>`;
+
+  // AI Day Optimizer
+  h+=`<div class="ai-box"><h3>AI Day Optimizer</h3><p style="font-size:13px;color:var(--text-2);margin-bottom:14px">Creates a time-blocked schedule based on your tasks, events, energy, and mood.</p>`;
+  h+=`${!loadApiKey()?`<div style="margin-bottom:14px"><label style="font-size:12px;font-weight:500;color:var(--text-2);display:flex;flex-direction:column;gap:4px">Anthropic API Key <span style="font-size:11px;font-weight:400;color:var(--text-3)">Required — get one at <a href="https://console.anthropic.com" target="_blank" style="color:var(--work-bar)">console.anthropic.com</a></span><input type="password" id="ai-api-key" placeholder="sk-ant-..." style="padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:13px;font-family:inherit;max-width:420px" onchange="saveApiKey(this.value.trim())"/></label></div>`:''}`;
+  h+=`<button class="btn btn-primary" onclick="generateDaySchedule('${dateStr}')" id="gen-day-btn">Optimize this day with AI</button><div class="ai-result" id="ai-day-result"></div></div>`;
+
+  h+=`</div>`;// end .day-view
   document.getElementById('schedule-content').innerHTML=h;
 }
+
+/* Timeline interactions */
+function quickSchedule(dateStr,slotId,timeVal){
+  const slots=dayTimeSlots[dateStr]||[];
+  const s=slots.find(x=>x.id===slotId);
+  if(s){s.start=timeVal;saveTimeSlots();renderSchedule()}
+}
+function toggleTimelineTask(dateStr,slotId){
+  const slots=dayTimeSlots[dateStr]||[];
+  const s=slots.find(x=>x.id===slotId);
+  if(!s||s.type!=='task')return;
+  s.done=!s.done;
+  // sync with weekAssignments
+  const assigned=weekAssignments[dateStr]||[];
+  const a=assigned.find(x=>'task-'+x.catId+'-'+x.taskId===slotId);
+  if(a)a.done=s.done;
+  const task=findTask(s.catId,s.taskId);
+  if(task)task.done=s.done;
+  save();saveTimeSlots();renderSchedule();
+}
+function moveDayTask2(dateStr,slotId){
+  // Move task to tomorrow
+  const slots=dayTimeSlots[dateStr]||[];
+  const sIdx=slots.findIndex(x=>x.id===slotId);
+  if(sIdx<0)return;
+  const s=slots[sIdx];
+  if(s.type!=='task')return;
+  // Remove from time slots
+  slots.splice(sIdx,1);
+  dayTimeSlots[dateStr]=slots;
+  // Move in weekAssignments
+  const assigned=weekAssignments[dateStr]||[];
+  const aIdx=assigned.findIndex(x=>'task-'+x.catId+'-'+x.taskId===slotId);
+  if(aIdx>=0){
+    const a=assigned.splice(aIdx,1)[0];
+    if(!assigned.length)delete weekAssignments[dateStr];
+    const nd=parseDate(dateStr);nd.setDate(nd.getDate()+1);const ns=fmtDate(nd);
+    if(!weekAssignments[ns])weekAssignments[ns]=[];
+    a.done=false;weekAssignments[ns].push(a);
+  }
+  save();saveTimeSlots();renderSchedule();
+}
+function removeDayTask2(dateStr,slotId){
+  const slots=dayTimeSlots[dateStr]||[];
+  dayTimeSlots[dateStr]=slots.filter(x=>x.id!==slotId);
+  // Also remove from weekAssignments
+  const assigned=weekAssignments[dateStr]||[];
+  const aIdx=assigned.findIndex(x=>'task-'+x.catId+'-'+x.taskId===slotId);
+  if(aIdx>=0){assigned.splice(aIdx,1);if(!assigned.length)delete weekAssignments[dateStr]}
+  save();saveTimeSlots();renderSchedule();
+}
+function autoScheduleDay(dateStr){
+  // Simple auto-scheduler: place unscheduled tasks in gaps
+  const slots=dayTimeSlots[dateStr]||[];
+  const scheduled=slots.filter(s=>s.start).sort((a,b)=>a.start.localeCompare(b.start));
+  const unscheduled=slots.filter(s=>!s.start&&s.type==='task');
+  if(!unscheduled.length)return;
+
+  // Find gaps starting at 8am
+  let cursor='08:00';
+  const busyRanges=scheduled.map(s=>({start:s.start,end:addMinutes(s.start,s.dur)}));
+
+  unscheduled.forEach(s=>{
+    // Advance cursor past any conflicts
+    let attempts=0;
+    while(attempts<50){
+      const curEnd=addMinutes(cursor,s.dur);
+      const conflict=busyRanges.find(b=>cursor<b.end&&curEnd>b.start);
+      if(!conflict)break;
+      cursor=conflict.end;
+      // Add 10 min buffer
+      cursor=addMinutes(cursor,10);
+      attempts++;
+    }
+    s.start=cursor;
+    busyRanges.push({start:cursor,end:addMinutes(cursor,s.dur)});
+    busyRanges.sort((a,b)=>a.start.localeCompare(b.start));
+    cursor=addMinutes(cursor,s.dur+10);
+  });
+  saveTimeSlots();renderSchedule();
+}
+
+/* Timeline drag & drop */
+let timelineDrag=null;
+function onTimelineDragStart(e,dateStr,slotId){
+  timelineDrag={dateStr,slotId};
+  e.dataTransfer.effectAllowed='move';
+  e.target.classList.add('dragging');
+}
+function onTimelineDragOver(e,hour,dateStr){
+  e.preventDefault();
+  e.currentTarget.style.background='var(--work-bg)';
+}
+function onTimelineDragLeave(e){
+  e.currentTarget.style.background='';
+}
+function onTimelineDrop(e,hour,dateStr){
+  e.preventDefault();
+  e.currentTarget.style.background='';
+  if(!timelineDrag)return;
+  const slots=dayTimeSlots[timelineDrag.dateStr]||[];
+  const s=slots.find(x=>x.id===timelineDrag.slotId);
+  if(s){
+    // Calculate minute from mouse position
+    const rect=e.currentTarget.getBoundingClientRect();
+    const pct=(e.clientY-rect.top)/rect.height;
+    const minute=pct<0.5?0:30;
+    s.start=String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0');
+    saveTimeSlots();
+  }
+  timelineDrag=null;
+  renderSchedule();
+}
+
 function shiftDay(dir){const d=parseDate(viewDay);d.setDate(d.getDate()+dir);viewDay=fmtDate(d);renderSchedule()}
 function goToday(){viewDay=todayStr();renderSchedule()}
 function saveDayLog(d,f,v){if(!dailyLogs[d])dailyLogs[d]={};if(f==='sleep'||f==='energy'||f==='mood')v=v?Number(v):null;dailyLogs[d][f]=v;save()}
@@ -484,10 +787,10 @@ function toggleDayTask(d,i){toggleWeekTask(d,i)}
 function moveDayTask(d,i){moveToTomorrow(d,i)}
 function removeDayTask(d,i){unassignTask(d,i)}
 
-/* AI */
+/* ==================== AI ==================== */
 function getApiKey(){
   const el=document.getElementById('ai-api-key');
-  if(el&&el.value.trim()) return el.value.trim();
+  if(el&&el.value.trim())return el.value.trim();
   return loadApiKey();
 }
 function saveApiKey(key){try{localStorage.setItem('dp-api-key',key)}catch(e){}}
@@ -496,49 +799,35 @@ function loadApiKey(){try{return localStorage.getItem('dp-api-key')||''}catch(e)
 function callClaude(prompt,btn,result,originalLabel){
   const apiKey=getApiKey();
   if(!apiKey){
-    result.innerHTML='<span style="color:#C62828">⚠ Please enter your Anthropic API key above. You can get one free at <a href="https://console.anthropic.com" target="_blank" style="color:#185FA5;text-decoration:underline">console.anthropic.com</a></span>';
-    btn.disabled=false;btn.textContent=originalLabel;
+    result.innerHTML='<span style="color:#C62828">⚠ Please enter your Anthropic API key. Get one free at <a href="https://console.anthropic.com" target="_blank" style="color:var(--work-bar);text-decoration:underline">console.anthropic.com</a></span>';
+    if(btn){btn.disabled=false;btn.textContent=originalLabel}
     return;
   }
   saveApiKey(apiKey);
-  btn.disabled=true;btn.textContent='Generating...';
+  if(btn){btn.disabled=true;btn.textContent='Generating...'}
   result.innerHTML='<span style="color:var(--text-3)">Thinking... this may take 10–20 seconds.</span>';
-
-  const headers={
-    'Content-Type':'application/json',
-    'x-api-key':apiKey,
-    'anthropic-version':'2023-06-01',
-    'anthropic-dangerous-direct-browser-access':'true'
-  };
 
   fetch('https://api.anthropic.com/v1/messages',{
     method:'POST',
-    headers,
-    body:JSON.stringify({
-      model:'claude-sonnet-4-20250514',
-      max_tokens:2000,
-      messages:[{role:'user',content:prompt}]
-    })
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':apiKey,
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,messages:[{role:'user',content:prompt}]})
   })
-  .then(r=>{
-    if(!r.ok) return r.json().then(d=>{throw new Error(d.error?.message||'API error '+r.status)}).catch(e=>{if(e.message.startsWith('API error')||e.message.includes('Invalid'))throw e;throw new Error('Request failed (status '+r.status+'). Check your API key.')});
-    return r.json();
-  })
+  .then(r=>{if(!r.ok)return r.json().then(d=>{throw new Error(d.error?.message||'API error '+r.status)}).catch(e=>{if(e.message.includes('API error')||e.message.includes('Invalid'))throw e;throw new Error('Request failed (status '+r.status+'). Check your API key.')});return r.json()})
   .then(data=>{
-    if(data.error){
-      result.innerHTML='<span style="color:#C62828">Error: '+(data.error.message||JSON.stringify(data.error))+'</span>';
-    } else {
-      const text=data.content?.map(b=>b.text||'').join('\n')||'No response received.';
-      result.textContent=text;
-    }
-    btn.disabled=false;btn.textContent=originalLabel;
+    if(data.error){result.innerHTML='<span style="color:#C62828">Error: '+esc(data.error.message||JSON.stringify(data.error))+'</span>'}
+    else{result.textContent=data.content?.map(b=>b.text||'').join('\n')||'No response.'}
+    if(btn){btn.disabled=false;btn.textContent=originalLabel}
   })
   .catch(err=>{
     let msg=err.message||'Unknown error';
-    if(msg.includes('Failed to fetch')||msg.includes('NetworkError'))
-      msg='Network error — this can happen if the API key is invalid or CORS is blocked. Double-check your key.';
+    if(msg.includes('Failed to fetch')||msg.includes('NetworkError'))msg='Network error — check your API key is valid. CORS errors usually mean the key is wrong.';
     result.innerHTML='<span style="color:#C62828">⚠ '+esc(msg)+'</span>';
-    btn.disabled=false;btn.textContent=originalLabel;
+    if(btn){btn.disabled=false;btn.textContent=originalLabel}
   });
 }
 
@@ -548,90 +837,28 @@ function generateWeekSchedule(){
   const wake=document.getElementById('ai-wake').value||'07:00';
   const sleep=document.getElementById('ai-sleep').value||'22:30';
   const dates=getWeekDates(weekStart);
-
-  let evStr='';
-  dates.forEach((d,i)=>{const ev=calEvents[d]||[];if(ev.length){evStr+=`\n${DAYNAMES[i]} (${d}):\n`;ev.forEach(e=>evStr+=`  ${e.start||'?'}-${e.end||'?'}: ${e.name}\n`)}});
-
-  let aStr='';
-  dates.forEach((d,i)=>{const a=weekAssignments[d]||[];if(a.length){aStr+=`\n${DAYNAMES[i]}: `+a.map(x=>{const t=findTask(x.catId,x.taskId);return t?`${t.text} (${t.dur||'?'})${x.done?' [DONE]':''}`:'?'}).join(', ')}});
-
+  let evStr='';dates.forEach((d,i)=>{const ev=calEvents[d]||[];if(ev.length){evStr+=`\n${DAYNAMES[i]} (${d}):\n`;ev.forEach(e=>evStr+=`  ${e.start||'?'}-${e.end||'?'}: ${e.name}\n`)}});
+  let aStr='';dates.forEach((d,i)=>{const a=weekAssignments[d]||[];if(a.length){aStr+=`\n${DAYNAMES[i]}: `+a.map(x=>{const t=findTask(x.catId,x.taskId);return t?`${t.text} (${t.dur||'?'})${x.done?' [DONE]':''}`:'?'}).join(', ')}});
   const unassigned=CATS.flatMap(c=>tasks[c.id].filter(t=>!t.done).map(t=>({...t,cat:c.name}))).filter(t=>!Object.values(weekAssignments).flat().some(a=>a.taskId===t.id));
   const uStr=unassigned.map(t=>`[${t.cat}] ${t.text} (${t.dur||'no est'})`).join('\n');
-
-  const prompt=`You are a weekly schedule optimizer. Create a realistic, balanced week plan.
-
-Wake: ${wake} | Sleep: ${sleep}
-
-CALENDAR EVENTS (fixed — schedule around these):
-${evStr||'(none)'}
-
-ALREADY ASSIGNED TO DAYS:
-${aStr||'(none)'}
-
-UNASSIGNED TASKS (distribute these across the week):
-${uStr||'(none)'}
-
-Rules:
-- Calendar events are FIXED — include them at their times, don't move them
-- Keep already-assigned tasks on their days unless there's a conflict
-- Distribute unassigned tasks evenly across the week
-- Multiple workouts per day is fine — vary them
-- Schedule high-focus work in mornings
-- Include breaks, meals, transitions
-- Don't overschedule any single day
-- Format each day as:
-  === MONDAY (date) ===
-  TIME — Activity (duration)
-- Keep it practical and human
-- Add brief notes on why you placed things where you did`;
-
+  const prompt=`You are a weekly schedule optimizer. Create a realistic, balanced week plan.\n\nWake: ${wake} | Sleep: ${sleep}\n\nCALENDAR EVENTS (fixed):\n${evStr||'(none)'}\n\nALREADY ASSIGNED:\n${aStr||'(none)'}\n\nUNASSIGNED TASKS:\n${uStr||'(none)'}\n\nRules:\n- Calendar events are FIXED\n- Keep assigned tasks on their days\n- Distribute unassigned evenly\n- High-focus work in mornings\n- Include breaks, meals\n- Format: === DAY (date) ===\\n  TIME — Activity (dur)\n- Be practical and human`;
   callClaude(prompt,btn,result,'Generate optimized week');
 }
 
-function generateDaySchedule(){
+function generateDaySchedule(dateStr){
   const btn=document.getElementById('gen-day-btn');
   const result=document.getElementById('ai-day-result');
-  const dateStr=viewDay;
   const d=parseDate(dateStr);
   const dayName=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
   const log=dailyLogs[dateStr]||{};
-  const evts=(calEvents[dateStr]||[]).slice().sort((a,b)=>(a.start||'').localeCompare(b.start||''));
+  const evts=(calEvents[dateStr]||[]).sort((a,b)=>(a.start||'').localeCompare(b.start||''));
   const assigned=weekAssignments[dateStr]||[];
 
-  let evStr='';
-  evts.forEach(e=>{evStr+=`  ${e.start||'?'}-${e.end||'?'}: ${e.name}\n`});
+  let evStr='';evts.forEach(e=>{evStr+=`  ${e.start||'?'}-${e.end||'?'}: ${e.name}\n`});
+  let taskStr='';assigned.forEach(a=>{const t=findTask(a.catId,a.taskId);if(!t)return;const cat=CATS.find(c=>c.id===a.catId);taskStr+=`  [${cat?.name||'?'}] ${t.text} (${t.dur||'no estimate'})${a.done?' [DONE]':''}\n`});
 
-  let taskStr='';
-  assigned.forEach(a=>{const t=findTask(a.catId,a.taskId);if(!t)return;const cat=CATS.find(c=>c.id===a.catId);taskStr+=`  [${cat?.name||'?'}] ${t.text} (${t.dur||'no estimate'})${a.done?' [DONE]':''}\n`});
-
-  const unassigned=CATS.flatMap(c=>tasks[c.id].filter(t=>!t.done).map(t=>({...t,cat:c.name}))).filter(t=>!Object.values(weekAssignments).flat().some(a=>a.taskId===t.id));
-  const uStr=unassigned.slice(0,15).map(t=>`  [${t.cat}] ${t.text} (${t.dur||'no est'})`).join('\n');
-
-  const prompt=`Create a realistic, time-blocked schedule for ${dayName}.
-
-Sleep last night: ${log.sleep||'not logged'} hours
-Energy level: ${log.energy||'not logged'}/10
-Mood: ${log.mood?['','😫 rough','😐 meh','🙂 good','😄 great'][log.mood]:'not logged'}
-
-FIXED EVENTS (do not move these):
-${evStr||'(none)'}
-
-ASSIGNED TASKS FOR TODAY:
-${taskStr||'(none)'}
-
-UNASSIGNED TASKS (optionally suggest fitting some in):
-${uStr||'(none)'}
-
-Rules:
-- Calendar events are FIXED — include them at their times
-- Schedule high-focus work during peak energy (usually morning)
-- If energy or sleep is low, go easier — lighter tasks first, harder ones midday
-- Include breaks, meals, and transitions
-- Be realistic about time — don't overschedule
-- Format: TIME — Activity (duration)
-- Keep it practical and human`;
-
-  callClaude(prompt,btn,result,'Optimize today');
+  const prompt=`Create a realistic, time-blocked schedule for ${dayName}.\n\nSleep last night: ${log.sleep||'not logged'} hours\nEnergy: ${log.energy||'not logged'}/10\nMood: ${log.mood?['','rough','meh','good','great'][log.mood]:'not logged'}\n\nFIXED EVENTS:\n${evStr||'(none)'}\n\nTASKS FOR TODAY:\n${taskStr||'(none)'}\n\nRules:\n- Events are FIXED at their times\n- High-focus work during peak energy (morning)\n- If low energy/sleep, go easier\n- Include breaks, meals, transitions\n- Format: TIME — Activity (duration)\n- Keep it practical`;
+  callClaude(prompt,btn,result,'Optimize this day with AI');
 }
 
 /* DATA */
